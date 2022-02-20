@@ -103,8 +103,12 @@ dist
 # TernJS port file
 .tern-port
 
-/extract
 
 *.zip
 
+nvdcve-1.1*.json
+
 .DS_Store
+
+/extract
+/docs
