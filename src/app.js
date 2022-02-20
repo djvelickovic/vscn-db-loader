@@ -6,8 +6,6 @@ const precheck = require('./precheck')
 const load = require('./load')
 const extract = require('./extract')
 
-module.exports.NVD_YEAR = '2022'
-
 dotenv.config()
 
 const year = process.argv[2]
@@ -28,7 +26,7 @@ const job = async () => {
 
     const data = await extract({ url: NVD_URL, zipName: NVD_ZIP_FILE, fileName: NVD_FILE, finalName: NVD_FINAL })
 
-    await load(data, result.meta, { uri, databaseName })
+    // await load(data, result.meta, { uri, databaseName })
 }
 
 job()
