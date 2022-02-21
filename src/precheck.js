@@ -1,11 +1,12 @@
 const { MongoClient } = require('mongodb')
+const { META_COLLECTION } = require('./constants')
 const axios = require('axios').default
 
-module.exports = async (nvdMetaUrl, year, { uri, databaseName, collectionName = 'metaCollection' }) => {
+module.exports = async (nvdMetaUrl, year, { uri, databaseName }) => {
     const client = new MongoClient(uri)
 
     const meta = await getNVDMeta(nvdMetaUrl)
-    console.log(`Fetched meta for year ${year}. Meta: ${JSON.stringify(meta)}`)
+    console.log(`Fetched meta for year ${year} with sha256: ${meta.sha256}`)
 
     const enrichedMeta = { ...meta, year }
 
@@ -13,7 +14,7 @@ module.exports = async (nvdMetaUrl, year, { uri, databaseName, collectionName = 
         await client.connect()
 
         const db = client.db(databaseName)
-        const collection = db.collection(collectionName)
+        const collection = db.collection(META_COLLECTION)
         const document = await collection.findOne({ year })
 
         if (!document) {
@@ -24,8 +25,10 @@ module.exports = async (nvdMetaUrl, year, { uri, databaseName, collectionName = 
         const { sha256 } = document
 
         if (meta.sha256 == sha256) {
+            console.log(`Document for the year ${year} with sha256: ${sha256} already exist. Skipping new load.`)
             return { success: false, meta: enrichedMeta }
         }
+        console.log(`Document for the year ${year} with sha256: ${sha256} is outdated. Initiating new load.`)
         return { success: true, meta: enrichedMeta }
     } finally {
         client.close()
@@ -46,7 +49,8 @@ const getNVDMeta = async (url) => {
  * @param {string} data
  */
 const parseMeta = (data) => {
-    const [lastModified, size, zipSize, gzSize, sha256] = data.split(/\r\n|\r|\n/)
+    const [lastModified, size, zipSize, gzSize, sha256Raw] = data.split(/\r\n|\r|\n/)
+    const sha256 = sha256Raw.split(':')[1]
     return {
         lastModified,
         size,

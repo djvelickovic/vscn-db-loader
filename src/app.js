@@ -26,7 +26,7 @@ const job = async () => {
 
     const data = await extract({ url: NVD_URL, zipName: NVD_ZIP_FILE, fileName: NVD_FILE, finalName: NVD_FINAL })
 
-    // await load(data, result.meta, { uri, databaseName })
+    await load(data, result.meta, { uri, databaseName })
 }
 
 job()
