@@ -6,7 +6,7 @@ module.exports = async (nvdMetaUrl, year, { uri, databaseName }) => {
     const client = new MongoClient(uri)
 
     const meta = await getNVDMeta(nvdMetaUrl)
-    console.log(`Fetched meta for year ${year} with sha256: ${meta.sha256}`)
+    console.log(`Fetched metadata for the year ${year} with sha256: ${meta.sha256}`)
 
     const enrichedMeta = { ...meta, year }
 
@@ -15,10 +15,10 @@ module.exports = async (nvdMetaUrl, year, { uri, databaseName }) => {
 
         const db = client.db(databaseName)
         const collection = db.collection(META_COLLECTION)
-        const document = await collection.findOne({ year })
+        const document = await collection.findOne({ type: `nvd_${year}` })
 
         if (!document) {
-            console.log(`Document for the year ${year} is not found`)
+            console.log(`Document for the year ${year} is not found in the database`)
             return { success: true, meta: enrichedMeta }
         }
 

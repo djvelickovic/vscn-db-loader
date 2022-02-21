@@ -20,13 +20,20 @@ const uri = process.env.MONGODB_URI
 const databaseName = process.env.MONGODB_DATABASE_NAME
 
 const job = async () => {
-    const result = await precheck(NVD_META_URL, year, { uri, databaseName })
+    if (!year) {
+        return console.error('[ERROR] - Please specify year')
+    }
 
-    if (!result.success) return
+    try {
+        const result = await precheck(NVD_META_URL, year, { uri, databaseName })
+        if (!result.success) return
 
-    const data = await extract({ url: NVD_URL, zipName: NVD_ZIP_FILE, fileName: NVD_FILE, finalName: NVD_FINAL })
+        const data = await extract({ url: NVD_URL, zipName: NVD_ZIP_FILE, fileName: NVD_FILE, finalName: NVD_FINAL })
 
-    await load(data, result.meta, { uri, databaseName })
+        await load(data, result.meta, { uri, databaseName })
+    } catch (error) {
+        console.error(error)
+    }
 }
 
 job()
