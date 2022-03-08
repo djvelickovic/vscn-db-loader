@@ -112,3 +112,7 @@ nvdcve-1.1*.json
 
 /extract
 /docs
+
+# Idea
+.idea/
+*.iml

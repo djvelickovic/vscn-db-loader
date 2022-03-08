@@ -1,10 +1,10 @@
 echo ">>> Downloading $1"
 
-curl --no-progress-meter $1 --output $2
+curl --no-progress-meter "$1" --output "$2"
 
 echo ">>> Extracting $2"
 
-unzip -oq $2
+unzip -oq "$2"
 
 echo ">>> Transforming $3"
 
@@ -23,9 +23,6 @@ jq '[ .CVE_Items[] | select((.configurations.nodes | length > 0) and (.configura
             versionStartExcluding: .versionStartExcluding,
             versionStartIncluding: .versionStartIncluding
             } | with_entries(select((.value != null) and (.value != "-") and (.value != "*"))) ]
-    }]' $3 | jq '[.[] | select( .config[] | .cpe.type == "a")]' > $4
+    }]' "$3" | jq '[.[] | select( .config[] | .cpe.type == "a")]' > "$4"
 
 echo "[DONE] Download, extraction and transformation done"
-
-
-

@@ -24,7 +24,7 @@ module.exports = async (nvdMetaUrl, year, { uri, databaseName }) => {
 
         const { sha256 } = document
 
-        if (meta.sha256 == sha256) {
+        if (meta.sha256 === sha256) {
             console.log(`Document for the year ${year} with sha256: ${sha256} already exist. Skipping new load.`)
             return { success: false, meta: enrichedMeta }
         }
