@@ -116,3 +116,5 @@ nvdcve-1.1*.json
 # Idea
 .idea/
 *.iml
+
+/tmp/
