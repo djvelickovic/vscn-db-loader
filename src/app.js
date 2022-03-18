@@ -1,7 +1,7 @@
 require('dotenv').config()
 const { loadCve } = require('./services/cveService')
 const { loadMatchers } = require('./services/matchersService')
-const { loadNvd } = require('./services/nvdService')
+const { loadNvd, loadNvdMetadata } = require('./services/nvdService')
 const { connectToServer, disconnect } = require('./utils/conn')
 const fs = require('fs')
 const { TMP_DIR } = require('./utils/paths')
@@ -22,8 +22,9 @@ const job = async () => {
     for (const year of years) {
 
       const nvdPath = await loadNvd(year)
-      await loadCve(year, nvdPath)
-      await loadMatchers(year, nvdPath)
+      const metadata = await loadNvdMetadata(year)
+      await loadCve(year, nvdPath, metadata)
+      await loadMatchers(year, nvdPath, metadata)
     }
   } finally {
     await disconnect()
@@ -38,6 +39,10 @@ const prepare = () => {
 
 prepare()
 
+loadNvdMetadata(2022).then(result => console.log(result))
+
 job()
   .then(() => console.log('Job is done.'))
   .catch(error => console.error(error))
+
+

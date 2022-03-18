@@ -6,7 +6,7 @@ const { MATCHERS_COLLECTION } = require('../constants')
 const path = require('path')
 const { TMP_DIR, MATCHERS_SCRIPT } = require('../utils/paths')
 
-module.exports.loadMatchers = async (year, nvdPath) => {
+module.exports.loadMatchers = async (year, nvdPath, metadata) => {
 
   const finalMatchersPath = path.join(TMP_DIR, `/matchers-${year}.json`)
   const output = await runner(MATCHERS_SCRIPT, nvdPath, finalMatchersPath)
@@ -15,7 +15,7 @@ module.exports.loadMatchers = async (year, nvdPath) => {
 
   const rawMatchers = await fs.readFile(finalMatchersPath)
   const matchers = JSON.parse(rawMatchers)
-  const transformedMatchers = await transform(matchers)
+  const transformedMatchers = await transform(matchers, metadata.sha256)
 
   console.log(`Matchers for insertion: ${transformedMatchers.length}`)
 
@@ -26,17 +26,17 @@ module.exports.loadMatchers = async (year, nvdPath) => {
   console.log(`Inserted ${result.insertedCount} matchers for the year ${year}`)
 }
 
-const transform = async (matchers) => {
+const transform = async (matchers, year, sha256) => {
   matchers.forEach(cve => {
-    const nodes = cve.config.nodes
+    const nodes = cve.config?.nodes
     const products = new Set()
     const vendors = new Set()
     //TODO: add OS
 
-    nodes.forEach(node => {
-      traverseNode(node, products, vendors)
-    })
+    nodes?.forEach(node => traverseNode(node, products, vendors))
 
+    cve.year = year
+    cve.sha256 = sha256
     cve.products = Array.from(products.keys())
     cve.vendors = Array.from(vendors.keys())
   })

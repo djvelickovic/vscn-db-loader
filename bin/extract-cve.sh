@@ -4,6 +4,5 @@ jq '[ .CVE_Items[] | {
       desc: .cve.description.description_data[0].value,
       severity: .impact.baseMetricV2.severity,
       published: .publishedDate,
-      lastModified: .lastModifiedDate,
-      year: "2022"
+      lastModified: .lastModifiedDate
     }]' "$1" > "$2"
