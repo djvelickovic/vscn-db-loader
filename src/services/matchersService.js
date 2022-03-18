@@ -19,12 +19,20 @@ module.exports.loadMatchers = async (year, nvdPath, metadata) => {
 
   console.log(`Matchers for insertion: ${transformedMatchers.length}`)
 
-  const result = await conn.getDb()
-    .collection(MATCHERS_COLLECTION)
-    .insertMany(transformedMatchers)
-
+  const result = await insertData(transformedMatchers)
   console.log(`Inserted ${result.insertedCount} matchers for the year ${year}`)
+
+  const deleteResult = await cleanupData(transformedMatchers)
+  console.log(`Deleted ${deleteResult.deletedCount} items`)
 }
+
+const cleanupData = (year, sha256) => conn.getDb()
+  .collection(MATCHERS_COLLECTION)
+  .deleteMany({ $and: [{ year: year }, { sha256: { $ne: sha256 } }] })
+
+const insertData = (matchers) => conn.getDb()
+  .collection(MATCHERS_COLLECTION)
+  .insertMany(matchers)
 
 const transform = async (matchers, year, sha256) => {
   matchers.forEach(cve => {
@@ -37,14 +45,14 @@ const transform = async (matchers, year, sha256) => {
 
     cve.year = year
     cve.sha256 = sha256
-    cve.products = Array.from(products.keys())
-    cve.vendors = Array.from(vendors.keys())
+    cve.products = [...products.keys()]
+    cve.vendors = [...vendors.keys()]
   })
   return matchers
 }
 
 const traverseNode = (node, products, vendors) => {
-  const {cpe_match: cpeMatch, children} = node
+  const { cpe_match: cpeMatch, children } = node
   if (children) {
     children.forEach(node => traverseNode(node, products, vendors))
   }

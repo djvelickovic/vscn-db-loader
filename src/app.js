@@ -39,8 +39,6 @@ const prepare = () => {
 
 prepare()
 
-loadNvdMetadata(2022).then(result => console.log(result))
-
 job()
   .then(() => console.log('Job is done.'))
   .catch(error => console.error(error))
