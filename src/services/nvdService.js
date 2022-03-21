@@ -5,7 +5,6 @@ const path = require('path')
 const { TMP_DIR } = require('../utils/paths')
 const axios = require('axios').default
 
-
 module.exports.loadNvd = async (year) => {
   const fileName = `nvdcve-1.1-${year}.json`
   const zipPath = path.join(TMP_DIR, `${fileName}.zip`)

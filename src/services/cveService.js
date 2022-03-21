@@ -6,7 +6,7 @@ const { CVE_COLLECTION } = require('../constants')
 const path = require('path')
 const { TMP_DIR, CVE_SCRIPT } = require('../utils/paths')
 
-module.exports.loadCve = async (year, nvdPath, nvdMetadata) => {
+module.exports.loadCve = async (year, nvdPath, metadata) => {
   const finalCvePath = path.join(TMP_DIR, `/cve-${year}.json`)
   const output = await runner(CVE_SCRIPT, nvdPath, finalCvePath)
 
@@ -15,12 +15,12 @@ module.exports.loadCve = async (year, nvdPath, nvdMetadata) => {
   const rawCve = await fs.readFile(finalCvePath)
   const cves = JSON.parse(rawCve)
 
-  const transformedCVEs = await transform(cves, year, nvdMetadata.sha256)
+  const transformedCVEs = await transform(cves, year, metadata.sha256)
 
   const result = await insertData(transformedCVEs)
   console.log(`Inserted ${result.insertedCount} cves for the year ${year}`)
 
-  const deleteResult = await cleanupData(year, nvdMetadata.sha256)
+  const deleteResult = await cleanupData(year, metadata.sha256)
   console.log(`Deleted ${deleteResult.deletedCount} items`)
 }
 

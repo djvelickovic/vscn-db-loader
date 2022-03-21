@@ -15,14 +15,14 @@ module.exports.loadMatchers = async (year, nvdPath, metadata) => {
 
   const rawMatchers = await fs.readFile(finalMatchersPath)
   const matchers = JSON.parse(rawMatchers)
-  const transformedMatchers = await transform(matchers, metadata.sha256)
+  const transformedMatchers = await transform(matchers, year, metadata.sha256)
 
   console.log(`Matchers for insertion: ${transformedMatchers.length}`)
 
   const result = await insertData(transformedMatchers)
   console.log(`Inserted ${result.insertedCount} matchers for the year ${year}`)
 
-  const deleteResult = await cleanupData(transformedMatchers)
+  const deleteResult = await cleanupData(year, metadata.sha256)
   console.log(`Deleted ${deleteResult.deletedCount} items`)
 }
 
