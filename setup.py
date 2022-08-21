@@ -12,6 +12,7 @@ setup(
         'certifi',
         'autopep8',
         'flake8',
+        'requests'
     ],
     author='Djordje Velickovic'
 )

@@ -8,7 +8,13 @@ python3 -m venv venv
 
 pip install pymongo
 pip install dnspython
+pip install requests
+pip install python-dotenv
 
-export MONGO_DB_URL=<url goes here>
+```
 
+create .env file in the root of the project and add:
+
+```env
+MONGO_DB_URL=<url goes here>
 ```
